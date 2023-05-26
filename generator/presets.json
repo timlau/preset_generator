@@ -1,0 +1,14 @@
+{
+    "plugins": ["generator.plugins.test","generator.plugins.grid"],
+    "generators": [
+      {
+        "type": "test",
+        "name": "Test"
+      },
+      {
+        "type": "grid",
+        "name": "Grid"
+      }
+    ]
+  }
+  
