@@ -1,6 +1,6 @@
 import json
 
-from generator.preset import factory, loader
+from generator.preset import InputValue, factory, loader
 
 
 def main() -> None:
@@ -19,6 +19,12 @@ def main() -> None:
         # do something with the generators
         for preset in presets:
             preset.generate()
+            needed_values: list[InputValue] = preset.inputs()
+            needs = ",".join([value.label for value in needed_values])
+            print(f" --> {preset.name} needs: {needs}")
+            for value in needed_values:
+                value.value_from_string("10")
+            print(needed_values)
 
 
 if __name__ == "__main__":
