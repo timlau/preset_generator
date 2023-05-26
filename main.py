@@ -13,10 +13,10 @@ def main() -> None:
         # load the plugins
         loader.load_plugins(data["plugins"])
 
-        # create the characters
+        # create the generators
         presets = [factory.create(item) for item in data["generators"]]
 
-        # do something with the characters
+        # do something with the generators
         for preset in presets:
             preset.generate()
 
