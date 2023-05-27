@@ -1,13 +1,16 @@
 import json
+from pathlib import Path
 
 from generator.preset import InputValue, factory, loader
+from generator import DATA_DIR
 
 
 def main() -> None:
     """Create game characters from a file containg a level definition."""
 
     # read data from a JSON file
-    with open("presets.json") as file:
+    file_name = DATA_DIR / Path("other/presets.json")
+    with file_name.open("r") as file:
         data = json.load(file)
 
         # load the plugins

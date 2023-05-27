@@ -1,18 +1,30 @@
-from dataclasses import dataclass
-from typing import Any, Type
+from collections import namedtuple
+import json
+
+from pathlib import Path
+
+from generator.preset import factory, loader
+from generator.preset.factory import PresetGenerator, InputValue
+from generator import DATA_DIR
 
 
-@dataclass
-class InputValue:
-    name: str
-    label: str
-    type: Type
-    value: Any = None
+def get_input_values(values: list[InputValue]):
+    names = [value.name for value in values]
+    Values = namedtuple("Values", names)
+    values = [value.value for value in values]
+    return Values(*values)
 
-    def value_from_string(self, value: str):
-        if self.type is str:
-            self.value = value
-        elif self.type is int:
-            self.value = int(value)
-        elif self.type is float:
-            self.value = float(value)
+
+def load_presets() -> list[PresetGenerator]:
+    # read data from a JSON file
+    file_name = DATA_DIR / Path("other/presets.json")
+    with file_name.open("r") as file:
+        data = json.load(file)
+
+        # load the plugins
+        loader.load_plugins(data["plugins"])
+
+        # create the generators
+        presets = [factory.create(item) for item in data["generators"]]
+
+    return presets

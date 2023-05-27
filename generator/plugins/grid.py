@@ -1,6 +1,7 @@
 """ test preset generator """
 from dataclasses import dataclass
-from generator.preset import factory, InputValue
+from generator.preset import factory, get_input_values
+from generator.preset.factory import InputValue
 
 
 @dataclass
@@ -10,15 +11,20 @@ class Grid:
 
     def generate(self) -> None:
         print(f"this is the {self.name} preset generator")
+        values = get_input_values(self.values)
+        print(values)
 
     def inputs(self) -> list[InputValue]:
-        return [
-            InputValue("rows", "Rows", int),
-            InputValue("columns", "Columns", int),
-        ]
+        if not self.values:
+            self.values = [
+                InputValue("rows", "Rows", int),
+                InputValue("columns", "Columns", int),
+            ]
+        return self.values
 
-    def set_values(self, values: list[InputValue]) -> None:
-        self.values = values
+    @property
+    def description(self) -> str:
+        return "Crop Rectangle: Grid presets"
 
 
 def register() -> None:
