@@ -1,18 +1,11 @@
-from collections import namedtuple
 import json
 
 from pathlib import Path
 
 from generator.preset import factory, loader
-from generator.preset.factory import PresetGenerator, InputValue
+from generator.preset.types import PresetGenerator
 from generator import DATA_DIR
-
-
-def get_input_values(values: list[InputValue]):
-    names = [value.name for value in values]
-    Values = namedtuple("Values", names)
-    values = [value.value for value in values]
-    return Values(*values)
+from generator.preset.utils import dict_to_namedtuple
 
 
 def load_presets() -> list[PresetGenerator]:
@@ -27,4 +20,9 @@ def load_presets() -> list[PresetGenerator]:
         # create the generators
         presets = [factory.create(item) for item in data["generators"]]
 
-    return presets
+        settings = dict_to_namedtuple(data["settings"])
+        # run setup on generators
+        for preset in presets:
+            preset.setup(settings)
+
+    return presets, settings

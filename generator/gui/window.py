@@ -9,7 +9,7 @@ from PyQt6 import uic
 
 from generator import DATA_DIR
 from generator.preset import PresetGenerator
-from generator.preset.factory import InputValue
+from generator.preset.types import InputValue
 
 
 class MainWindow(QWidget):
@@ -19,6 +19,10 @@ class MainWindow(QWidget):
         uic.loadUi(ui_file, self)
         self.presets = None
         self.ui = None
+        self.settings = None
+
+    def setup(self, settings):
+        self.settings = settings
 
     def add_presets(self, presets: list[PresetGenerator]):
         self.presets = presets
@@ -41,6 +45,8 @@ class MainWindow(QWidget):
             label = QLabel(value.label)
             edit = QLineEdit()
             self.ui.append(edit)
+            if value.value:
+                edit.setText(str(value.value))
             fbox.addRow(label, edit)
 
     def on_preset_activated(self):

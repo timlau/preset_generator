@@ -1,14 +1,22 @@
 {
-    "plugins": ["generator.plugins.test","generator.plugins.grid"],
+    "plugins": ["generator.plugins.grid","generator.plugins.slidein"],
     "generators": [
-      {
-        "type": "test",
-        "name": "Test"
-      },
       {
         "type": "grid",
         "name": "Grid"
+      },
+      {
+        "type": "slidein",
+        "name": "SlideIn",
+        "width": 3840,
+        "height": 2150,
+        "fps": 30,
+        "duration":5,
+        "size": 2
       }
-    ]
+    ],
+    "settings": {
+      "output": "~/Documents/Shotcut"
+    }
   }
   
