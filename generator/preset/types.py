@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, Protocol, Type
 
+from generator.plugins import PresetType
+
 
 @dataclass
 class InputValue:
@@ -26,6 +28,9 @@ class PresetGenerator(Protocol):
         ...
 
     def inputs(self) -> list[InputValue]:
+        ...
+
+    def types(self) -> list[PresetType]:
         ...
 
     @property

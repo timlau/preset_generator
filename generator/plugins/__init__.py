@@ -1,5 +1,19 @@
 from dataclasses import dataclass
+from enum import StrEnum
 from functools import cached_property
+
+
+class PresetType(StrEnum):
+    CROP_RECTANGLE = "cropRectangle"
+    SIZE_POSITION_ROTATE = "affineSizePosition"
+    MASK_SIMPLE = "maskSimpleShape"
+
+
+PRESET_NAMES = {
+    PresetType.CROP_RECTANGLE: "Crop Rectangle",
+    PresetType.SIZE_POSITION_ROTATE: "Size, Position & Restore",
+    PresetType.MASK_SIMPLE: "Mask: Simple Shape",
+}
 
 
 @dataclass

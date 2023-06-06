@@ -1,4 +1,5 @@
 from pathlib import Path
+import platform
 
 from PyQt6.QtWidgets import (
     QWidget,
@@ -8,8 +9,10 @@ from PyQt6.QtWidgets import (
 from PyQt6 import uic
 
 from generator import DATA_DIR
+from generator.plugins import PRESET_NAMES
 from generator.preset import PresetGenerator
 from generator.preset.types import InputValue
+from generator.preset.utils import get_output_path
 
 
 class MainWindow(QWidget):
@@ -23,6 +26,7 @@ class MainWindow(QWidget):
 
     def setup(self, settings):
         self.settings = settings
+        self.get_output_path()
 
     def add_presets(self, presets: list[PresetGenerator]):
         self.presets = presets
@@ -32,11 +36,21 @@ class MainWindow(QWidget):
         self.btn_generate.clicked.connect(self.on_generate_clicked)
         self.setup_parameters(self.presets[0])
 
+    def get_output_path(self):
+        print(f"platform: {platform.system()}")
+        if platform.system() == "Linux":
+            if path := get_output_path(self.settings.LIXUX_PATHS):
+                self.settings = self.settings._replace(output=path)
+                print(self.settings.output)
+
     def clean_out_widgets(self, layout):
         for i in reversed(range(layout.count())):
             layout.itemAt(i).widget().deleteLater()
 
     def setup_parameters(self, preset: PresetGenerator):
+        self.cb_preset_type.clear()
+        for preset_type in preset.types():
+            self.cb_preset_type.addItem(PRESET_NAMES[preset_type])
         needed_values: list[InputValue] = preset.inputs()
         fbox = self.fl_parameters
         self.clean_out_widgets(fbox)
@@ -57,6 +71,9 @@ class MainWindow(QWidget):
     def on_generate_clicked(self):
         index = self.cb_presets.currentIndex()
         preset = self.presets[index]
+        index = self.cb_preset_type.currentIndex()
+        preset.active_type = preset.types()[index]
+        preset.output = self.settings.output
         print(f"Generating : {preset.name}")
         needed_values: list[InputValue] = preset.inputs()
         for i, value in enumerate(needed_values):

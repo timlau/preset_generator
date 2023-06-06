@@ -6,7 +6,7 @@ import urllib
 from collections import namedtuple
 from dataclasses import dataclass
 from pathlib import Path
-from generator.plugins import GridCalculator
+from generator.plugins import GridCalculator, PresetType
 from generator.preset import factory
 from generator.preset.utils import get_input_values, to_percent
 from generator.preset.types import InputValue
@@ -39,6 +39,7 @@ class SlideInPreset:
     values: list[InputValue] = None
     output: str = "./shotcut"
     grid_calc: GridCalculator = None
+    active_preset: PresetType = PresetType.CROP_RECTANGLE
 
     def setup(self, settings: namedtuple) -> None:
         self.output = settings.output
@@ -60,9 +61,12 @@ class SlideInPreset:
             ]
         return self.values
 
+    def types(self) -> list(PresetType):
+        return [PresetType.CROP_RECTANGLE]
+
     @property
     def description(self) -> str:
-        return "Crop Rectangle: Slide in from corners"
+        return "Slide-In from corners"
 
     @property
     def frame_end(self):
@@ -174,7 +178,9 @@ class SlideInPreset:
 
     def write_preset(self, name: str, preset: str):
         qf_name = urllib.parse.quote_plus(name)
-        directory = Path(self.output).expanduser() / Path("presets/cropRectangle")
+        directory = (
+            Path(self.output).expanduser() / Path("presets") / Path(self.active_preset)
+        )
         if not directory.exists():
             directory.mkdir(parents=True, exist_ok=True)
         path = directory / Path(qf_name)
