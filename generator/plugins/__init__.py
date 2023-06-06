@@ -1,5 +1,6 @@
+from collections import namedtuple
 from dataclasses import dataclass
-from enum import StrEnum
+from enum import IntEnum, StrEnum
 from functools import cached_property
 
 
@@ -14,6 +15,69 @@ PRESET_NAMES = {
     PresetType.SIZE_POSITION_ROTATE: "Size, Position & Restore",
     PresetType.MASK_SIMPLE: "Mask: Simple Shape",
 }
+
+
+ModMatrix = namedtuple("ModMatrix", ["dx", "dy", "xfac", "yfac"])
+
+
+class CornerType(IntEnum):
+    TopLeft = 1
+    TopRight = 2
+    BottomLeft = 3
+    BottomRight = 4
+
+
+MOD_CORNERS = {
+    CornerType.TopLeft: ModMatrix(dx=1, dy=1, xfac=0, yfac=0),
+    CornerType.TopRight: ModMatrix(dx=0.5, dy=1, xfac=1, yfac=0),
+    CornerType.BottomLeft: ModMatrix(dx=1, dy=0.5, xfac=0, yfac=1),
+    CornerType.BottomRight: ModMatrix(dx=0.5, dy=0.5, xfac=1, yfac=1),
+}
+
+
+@dataclass
+class BorderCalc:
+    size: float
+    width: int = 3840
+    height: int = 2160
+    padding: int = 32
+
+    @property
+    def prefix_x(self):
+        return ((100 - self.size) / 100) * self.width
+
+    @property
+    def prefix_y(self):
+        return ((100 - self.size) / 100) * self.height
+
+    @property
+    def border(self):
+        return self.padding / 2
+
+    @property
+    def block_width(self):
+        return self.width * (self.size / 100)
+
+    @property
+    def block_height(self):
+        return self.height * (self.size / 100)
+
+    def start_point(self, mod: ModMatrix):
+        x0 = mod.xfac * self.prefix_x
+        y0 = mod.yfac * self.prefix_y
+        x = x0 + (self.border * mod.dx)
+        y = y0 + (self.border * mod.dy)
+        return x, y
+
+    def block_size(self, mod: ModMatrix):
+        x, y = self.start_point(mod)
+        w = self.block_width - (self.border * 1.5)
+        h = self.block_height - (self.border * 1.5)
+        return round(x), round(y), round(w), round(h)
+
+    def calc_block(self, corner: CornerType):
+        mod = MOD_CORNERS[corner]
+        return self.block_size(mod)
 
 
 @dataclass
