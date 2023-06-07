@@ -78,30 +78,30 @@ class BlockCalc:
     def block_height(self):
         return self.height * (self.size / 100)
 
-    def start_point(self, mod: ModMatrix):
+    def position(self, mod: ModMatrix):
         x0 = mod.xadj * self.prefix_x
         y0 = mod.yadj * self.prefix_y
         x = x0 + (self.border * mod.dx)
         y = y0 + (self.border * mod.dy)
         return x, y
 
-    def block_size(self, mod: ModMatrix):
-        x, y = self.start_point(mod)
+    def calc_block(self, mod: ModMatrix):
+        x, y = self.position(mod)
         w = self.block_width - (self.border * mod.dw)
         h = self.block_height - (self.border * mod.dh)
         return round(x), round(y), round(w), round(h)
 
     def calc_crop(self, corner: BlockType):
         mod = CROP_BLOCKS[corner]
-        return self.block_size(mod)
+        return self.calc_block(mod)
 
     def calc_mask(self, corner: BlockType):
         mod = MASK_BLOCKS[corner]
-        return self.block_size(mod)
+        return self.calc_block(mod)
 
     def calc_spr(self, corner: BlockType):
         mod = SPR_BLOCKS[corner]
-        return self.block_size(mod)
+        return self.calc_block(mod)
 
 
 @dataclass

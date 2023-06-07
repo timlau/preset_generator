@@ -28,35 +28,35 @@ def test_block_wh(calc: BlockCalc):
 
 def test_start_point_top_left(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.TopLeft]
-    x, y = calc.start_point(mod)
+    x, y = calc.position(mod)
     assert x == 16
     assert y == 16
 
 
 def test_start_point_top_right(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.TopRight]
-    x, y = calc.start_point(mod)
+    x, y = calc.position(mod)
     assert x == 1928
     assert y == 16
 
 
 def test_start_point_bottom_left(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.BottomLeft]
-    x, y = calc.start_point(mod)
+    x, y = calc.position(mod)
     assert x == 16
     assert y == 1088
 
 
 def test_start_point_bottom_right(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.BottomRight]
-    x, y = calc.start_point(mod)
+    x, y = calc.position(mod)
     assert x == 1928
     assert y == 1088
 
 
 def test_block_size_top_left(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.TopLeft]
-    _, _, w, h = calc.block_size(mod)
+    _, _, w, h = calc.calc_block(mod)
     assert w == 1896
     assert h == 1056
 
@@ -64,7 +64,7 @@ def test_block_size_top_left(calc: BlockCalc):
 def test_block_size_top_right(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.TopRight]
     print(mod)
-    _, _, w, h = calc.block_size(mod)
+    _, _, w, h = calc.calc_block(mod)
     assert w == 1896
     assert h == 1056
 
@@ -72,7 +72,7 @@ def test_block_size_top_right(calc: BlockCalc):
 def test_block_size_bottom_left(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.BottomLeft]
     print(mod)
-    _, _, w, h = calc.block_size(mod)
+    _, _, w, h = calc.calc_block(mod)
     assert w == 1896
     assert h == 1048
 
@@ -80,7 +80,7 @@ def test_block_size_bottom_left(calc: BlockCalc):
 def test_block_size_bottom_right(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.BottomRight]
     print(mod)
-    _, _, w, h = calc.block_size(mod)
+    _, _, w, h = calc.calc_block(mod)
     assert w == 1896
     assert h == 1048
 
