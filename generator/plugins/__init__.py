@@ -17,7 +17,7 @@ PRESET_NAMES = {
 }
 
 
-ModMatrix = namedtuple("ModMatrix", ["dx", "dy", "xfac", "yfac"])
+ModMatrix = namedtuple("ModMatrix", ["dx", "dy", "dw", "dh", "xadj", "yadj"])
 
 
 class CornerType(IntEnum):
@@ -28,10 +28,10 @@ class CornerType(IntEnum):
 
 
 MOD_CORNERS = {
-    CornerType.TopLeft: ModMatrix(dx=1, dy=1, xfac=0, yfac=0),
-    CornerType.TopRight: ModMatrix(dx=0.5, dy=1, xfac=1, yfac=0),
-    CornerType.BottomLeft: ModMatrix(dx=1, dy=0.5, xfac=0, yfac=1),
-    CornerType.BottomRight: ModMatrix(dx=0.5, dy=0.5, xfac=1, yfac=1),
+    CornerType.TopLeft: ModMatrix(dx=1, dy=1, dw=1.5, dh=1.5, xadj=0, yadj=0),
+    CornerType.TopRight: ModMatrix(dx=0.5, dy=1, dw=1.5, dh=1.5, xadj=1, yadj=0),
+    CornerType.BottomLeft: ModMatrix(dx=1, dy=0.5, dw=1.5, dh=2, xadj=0, yadj=1),
+    CornerType.BottomRight: ModMatrix(dx=0.5, dy=0.5, dw=1.5, dh=2, xadj=1, yadj=1),
 }
 
 
@@ -63,16 +63,16 @@ class BorderCalc:
         return self.height * (self.size / 100)
 
     def start_point(self, mod: ModMatrix):
-        x0 = mod.xfac * self.prefix_x
-        y0 = mod.yfac * self.prefix_y
+        x0 = mod.xadj * self.prefix_x
+        y0 = mod.yadj * self.prefix_y
         x = x0 + (self.border * mod.dx)
         y = y0 + (self.border * mod.dy)
         return x, y
 
     def block_size(self, mod: ModMatrix):
         x, y = self.start_point(mod)
-        w = self.block_width - (self.border * 1.5)
-        h = self.block_height - (self.border * 1.5)
+        w = self.block_width - (self.border * mod.dw)
+        h = self.block_height - (self.border * mod.dh)
         return round(x), round(y), round(w), round(h)
 
     def calc_block(self, corner: CornerType):

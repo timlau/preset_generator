@@ -7,6 +7,11 @@ def calc() -> BorderCalc:
     return BorderCalc(size=50)
 
 
+@pytest.fixture
+def calc75() -> BorderCalc:
+    return BorderCalc(size=75)
+
+
 def test_prefix(calc: BorderCalc):
     assert calc.prefix_x == 1920
     assert calc.prefix_y == 1080
@@ -69,7 +74,7 @@ def test_block_size_bottom_left(calc: BorderCalc):
     print(mod)
     _, _, w, h = calc.block_size(mod)
     assert w == 1896
-    assert h == 1056
+    assert h == 1048
 
 
 def test_block_size_bottom_right(calc: BorderCalc):
@@ -77,12 +82,20 @@ def test_block_size_bottom_right(calc: BorderCalc):
     print(mod)
     _, _, w, h = calc.block_size(mod)
     assert w == 1896
-    assert h == 1056
+    assert h == 1048
 
 
 def test_calc_block(calc: BorderCalc):
     x, y, w, h = calc.calc_block(CornerType.TopLeft)
     assert w == 1896
     assert h == 1056
+    assert x == 16
+    assert y == 16
+
+
+def test_calc_block75(calc75: BorderCalc):
+    x, y, w, h = calc75.calc_block(CornerType.TopLeft)
+    assert w == 2856
+    assert h == 1596
     assert x == 16
     assert y == 16
