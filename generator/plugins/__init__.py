@@ -12,7 +12,7 @@ class PresetType(StrEnum):
 
 PRESET_NAMES = {
     PresetType.CROP_RECTANGLE: "Crop Rectangle",
-    PresetType.SIZE_POSITION_ROTATE: "Size, Position & Restore",
+    PresetType.SIZE_POSITION_ROTATE: "Size, Position & Rotate",
     PresetType.MASK_SIMPLE: "Mask: Simple Shape",
 }
 
