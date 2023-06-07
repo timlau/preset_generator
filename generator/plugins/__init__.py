@@ -20,27 +20,34 @@ PRESET_NAMES = {
 ModMatrix = namedtuple("ModMatrix", ["dx", "dy", "dw", "dh", "xadj", "yadj"])
 
 
-class CornerType(IntEnum):
+class BlockType(IntEnum):
     TopLeft = 1
     TopRight = 2
     BottomLeft = 3
     BottomRight = 4
 
 
-CROP_CORNERS = {
-    CornerType.TopLeft: ModMatrix(dx=1, dy=1, dw=1.5, dh=1.5, xadj=0, yadj=0),
-    CornerType.TopRight: ModMatrix(dx=0.5, dy=1, dw=1.5, dh=1.5, xadj=1, yadj=0),
-    CornerType.BottomLeft: ModMatrix(dx=1, dy=0.5, dw=1.5, dh=2, xadj=0, yadj=1),
-    CornerType.BottomRight: ModMatrix(dx=0.5, dy=0.5, dw=1.5, dh=2, xadj=1, yadj=1),
+CROP_BLOCKS = {
+    BlockType.TopLeft: ModMatrix(dx=1, dy=1, dw=1.5, dh=1.5, xadj=0, yadj=0),
+    BlockType.TopRight: ModMatrix(dx=0.5, dy=1, dw=1.5, dh=1.5, xadj=1, yadj=0),
+    BlockType.BottomLeft: ModMatrix(dx=1, dy=0.5, dw=1.5, dh=2, xadj=0, yadj=1),
+    BlockType.BottomRight: ModMatrix(dx=0.5, dy=0.5, dw=1.5, dh=2, xadj=1, yadj=1),
 }
 
-MASK_CORNERS = {
-    CornerType.TopLeft: ModMatrix(dx=0, dy=0, dw=-0.5, dh=-0.5, xadj=0, yadj=0),
-    CornerType.TopRight: ModMatrix(dx=-0.5, dy=0, dw=-0.5, dh=-0.5, xadj=1, yadj=0),
-    CornerType.BottomLeft: ModMatrix(dx=0, dy=-0.5, dw=-0.5, dh=-0.5, xadj=0, yadj=1),
-    CornerType.BottomRight: ModMatrix(
+MASK_BLOCKS = {
+    BlockType.TopLeft: ModMatrix(dx=0, dy=0, dw=-0.5, dh=-0.5, xadj=0, yadj=0),
+    BlockType.TopRight: ModMatrix(dx=-0.5, dy=0, dw=-0.5, dh=-0.5, xadj=1, yadj=0),
+    BlockType.BottomLeft: ModMatrix(dx=0, dy=-0.5, dw=-0.5, dh=-0.5, xadj=0, yadj=1),
+    BlockType.BottomRight: ModMatrix(
         dx=-0.5, dy=-0.5, dw=-0.5, dh=-0.5, xadj=1, yadj=1
     ),
+}
+
+SPR_BLOCKS = {
+    BlockType.TopLeft: ModMatrix(dx=0, dy=0, dw=-0, dh=0, xadj=0, yadj=0),
+    BlockType.TopRight: ModMatrix(dx=-0, dy=0, dw=0, dh=0, xadj=1, yadj=0),
+    BlockType.BottomLeft: ModMatrix(dx=0, dy=-0, dw=0.0, dh=-0, xadj=0, yadj=1),
+    BlockType.BottomRight: ModMatrix(dx=0, dy=0, dw=-0, dh=-0, xadj=1, yadj=1),
 }
 
 
@@ -84,12 +91,16 @@ class BorderCalc:
         h = self.block_height - (self.border * mod.dh)
         return round(x), round(y), round(w), round(h)
 
-    def calc_crop(self, corner: CornerType):
-        mod = CROP_CORNERS[corner]
+    def calc_crop(self, corner: BlockType):
+        mod = CROP_BLOCKS[corner]
         return self.block_size(mod)
 
-    def calc_mask(self, corner: CornerType):
-        mod = MASK_CORNERS[corner]
+    def calc_mask(self, corner: BlockType):
+        mod = MASK_BLOCKS[corner]
+        return self.block_size(mod)
+
+    def calc_spr(self, corner: BlockType):
+        mod = SPR_BLOCKS[corner]
         return self.block_size(mod)
 
 

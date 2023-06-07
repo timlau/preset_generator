@@ -6,7 +6,13 @@ import urllib
 from collections import namedtuple
 from dataclasses import dataclass
 from pathlib import Path
-from generator.plugins import CROP_CORNERS, MASK_CORNERS, BorderCalc, PresetType
+from generator.plugins import (
+    CROP_BLOCKS,
+    MASK_BLOCKS,
+    SPR_BLOCKS,
+    BorderCalc,
+    PresetType,
+)
 from generator.preset import factory
 from generator.preset.utils import get_input_values, to_percent
 from generator.preset.types import InputValue
@@ -108,7 +114,7 @@ class PipPreset:
 
     def calc_crop_preset(self):
         calculator = BorderCalc(size=self.size)
-        for corner in CROP_CORNERS.keys():
+        for corner in CROP_BLOCKS.keys():
             prefix = f"Pip_{corner.name}"
             template = Template(PRESETS[self.active_type])
             x, y, w, h = calculator.calc_crop(corner)
@@ -122,7 +128,7 @@ class PipPreset:
 
     def calc_mask_preset(self):
         calculator = BorderCalc(size=self.size)
-        for corner in MASK_CORNERS.keys():
+        for corner in MASK_BLOCKS.keys():
             prefix = f"Pip_{corner.name}"
             template = Template(PRESETS[self.active_type])
             x, y, w, h = calculator.calc_mask(corner)
@@ -134,56 +140,19 @@ class PipPreset:
             )
             self.write_preset(f"{prefix}_{self.filename}", tpl)
 
-    def calc_top_left(self, border: bool = True):
-        prefix = "Pip_TopLeft"
-        template = Template(PRESETS[self.active_type])
-        x = y = 0
-        tpl = template.substitute(
-            x=to_percent(x, self.width),
-            y=to_percent(y, self.height),
-            height=self.padded_size(),
-            width=self.padded_size(),
-        )
-        self.write_preset(f"{prefix}_{self.filename}", tpl)
-
-    def calc_top_right(self, border: bool = True):
-        prefix = "Pip_TopRight"
-        template = Template(PRESETS[self.active_type])
-        x = round(self.prefix * self.width)
-        y = 0
-        tpl = template.substitute(
-            x=to_percent(x, self.width),
-            y=to_percent(y, self.height),
-            height=self.padded_size(),
-            width=self.padded_size(),
-        )
-        self.write_preset(f"{prefix}_{self.filename}", tpl)
-
-    def calc_bottom_left(self, border: bool = True):
-        prefix = "Pip_BottomLeft"
-        template = Template(PRESETS[self.active_type])
-        x = 0
-        y = round(self.prefix * self.height)
-        tpl = template.substitute(
-            x=to_percent(x, self.width),
-            y=to_percent(y, self.height),
-            height=self.padded_size(),
-            width=self.padded_size(),
-        )
-        self.write_preset(f"{prefix}_{self.filename}", tpl)
-
-    def calc_bottom_right(self, border: bool = True):
-        prefix = "Pip_BottomRight"
-        template = Template(PRESETS[self.active_type])
-        x = round(self.prefix * self.width)
-        y = round(self.prefix * self.height)
-        tpl = template.substitute(
-            x=to_percent(x, self.width),
-            y=to_percent(y, self.height),
-            height=self.padded_size(),
-            width=self.padded_size(),
-        )
-        self.write_preset(f"{prefix}_{self.filename}", tpl)
+    def calc_spr_preset(self):
+        calculator = BorderCalc(size=self.size)
+        for corner in SPR_BLOCKS.keys():
+            prefix = f"Pip_{corner.name}"
+            template = Template(PRESETS[self.active_type])
+            x, y, w, h = calculator.calc_mask(corner)
+            tpl = template.substitute(
+                x=to_percent(x, self.width),
+                y=to_percent(y, self.height),
+                height=to_percent(h, self.height),
+                width=to_percent(w, self.width),
+            )
+            self.write_preset(f"{prefix}_{self.filename}", tpl)
 
     def write_preset(self, name: str, preset: str):
         qf_name = urllib.parse.quote_plus(name)
@@ -196,12 +165,6 @@ class PipPreset:
         print(f"create preset {name} : {path.resolve().name} in {directory}")
         with open(path.resolve(), "w") as out_file:
             out_file.write(preset)
-
-    def calc_spr_preset(self):
-        self.calc_top_left()
-        self.calc_top_right()
-        self.calc_bottom_left()
-        self.calc_bottom_right()
 
 
 def register() -> None:
