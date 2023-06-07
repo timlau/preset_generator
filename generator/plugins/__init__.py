@@ -109,7 +109,7 @@ class GridCalculator:
     rows: int
     columns: int
     width: int = 3840
-    height: int = 2150
+    height: int = 2160
     padding: int = 32
 
     @cached_property
@@ -125,19 +125,16 @@ class GridCalculator:
         last_row = start_row + num_row
         if border:
             dt = self.padding / 2
-            extra = 0
         else:
             dt = 0
-            # if no border we need to add extra to width & height
-            extra = self.padding / 2
-        x = round(dt + (start_col * self.block_width))
-        y = round(dt + (start_row * self.block_height))
+        x = dt + (start_col * self.block_width)
+        y = dt + (start_row * self.block_height)
         if last_col == self.columns:
-            width = round(num_col * self.block_width - (2 * dt)) + extra
+            width = num_col * self.block_width - (2 * dt)
         else:
-            width = round(num_col * self.block_width - (dt)) + extra
+            width = num_col * self.block_width - (dt)
         if last_row == self.rows:
-            height = round(num_row * self.block_height - (2 * dt)) + extra
+            height = num_row * self.block_height - (2 * dt)
         else:
-            height = round(num_row * self.block_height - (dt)) + extra
-        return x, y, width, height
+            height = num_row * self.block_height - (dt)
+        return round(x), round(y), round(width), round(height)
