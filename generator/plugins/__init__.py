@@ -52,7 +52,7 @@ SPR_BLOCKS = {
 
 
 @dataclass
-class BorderCalc:
+class BlockCalc:
     size: float
     width: int = 3840
     height: int = 2160

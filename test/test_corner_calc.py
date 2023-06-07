@@ -1,67 +1,67 @@
 import pytest
-from generator.plugins import CROP_BLOCKS, BorderCalc, BlockType
+from generator.plugins import CROP_BLOCKS, BlockCalc, BlockType
 
 
 @pytest.fixture
-def calc() -> BorderCalc:
-    return BorderCalc(size=50)
+def calc() -> BlockCalc:
+    return BlockCalc(size=50)
 
 
 @pytest.fixture
-def calc75() -> BorderCalc:
-    return BorderCalc(size=75)
+def calc75() -> BlockCalc:
+    return BlockCalc(size=75)
 
 
-def test_prefix(calc: BorderCalc):
+def test_prefix(calc: BlockCalc):
     assert calc.prefix_x == 1920
     assert calc.prefix_y == 1080
 
 
-def test_border(calc: BorderCalc):
+def test_border(calc: BlockCalc):
     assert calc.border == 16
 
 
-def test_block_wh(calc: BorderCalc):
+def test_block_wh(calc: BlockCalc):
     assert calc.block_width == 1920
     assert calc.block_height == 1080
 
 
-def test_start_point_top_left(calc: BorderCalc):
+def test_start_point_top_left(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.TopLeft]
     x, y = calc.start_point(mod)
     assert x == 16
     assert y == 16
 
 
-def test_start_point_top_right(calc: BorderCalc):
+def test_start_point_top_right(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.TopRight]
     x, y = calc.start_point(mod)
     assert x == 1928
     assert y == 16
 
 
-def test_start_point_bottom_left(calc: BorderCalc):
+def test_start_point_bottom_left(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.BottomLeft]
     x, y = calc.start_point(mod)
     assert x == 16
     assert y == 1088
 
 
-def test_start_point_bottom_right(calc: BorderCalc):
+def test_start_point_bottom_right(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.BottomRight]
     x, y = calc.start_point(mod)
     assert x == 1928
     assert y == 1088
 
 
-def test_block_size_top_left(calc: BorderCalc):
+def test_block_size_top_left(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.TopLeft]
     _, _, w, h = calc.block_size(mod)
     assert w == 1896
     assert h == 1056
 
 
-def test_block_size_top_right(calc: BorderCalc):
+def test_block_size_top_right(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.TopRight]
     print(mod)
     _, _, w, h = calc.block_size(mod)
@@ -69,7 +69,7 @@ def test_block_size_top_right(calc: BorderCalc):
     assert h == 1056
 
 
-def test_block_size_bottom_left(calc: BorderCalc):
+def test_block_size_bottom_left(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.BottomLeft]
     print(mod)
     _, _, w, h = calc.block_size(mod)
@@ -77,7 +77,7 @@ def test_block_size_bottom_left(calc: BorderCalc):
     assert h == 1048
 
 
-def test_block_size_bottom_right(calc: BorderCalc):
+def test_block_size_bottom_right(calc: BlockCalc):
     mod = CROP_BLOCKS[BlockType.BottomRight]
     print(mod)
     _, _, w, h = calc.block_size(mod)
@@ -85,7 +85,7 @@ def test_block_size_bottom_right(calc: BorderCalc):
     assert h == 1048
 
 
-def test_calc_crop(calc: BorderCalc):
+def test_calc_crop(calc: BlockCalc):
     x, y, w, h = calc.calc_crop(BlockType.TopLeft)
     assert w == 1896
     assert h == 1056
@@ -93,7 +93,7 @@ def test_calc_crop(calc: BorderCalc):
     assert y == 16
 
 
-def test_calc_crop75(calc75: BorderCalc):
+def test_calc_crop75(calc75: BlockCalc):
     x, y, w, h = calc75.calc_crop(BlockType.TopLeft)
     assert w == 2856
     assert h == 1596
@@ -101,7 +101,7 @@ def test_calc_crop75(calc75: BorderCalc):
     assert y == 16
 
 
-def test_calc_mask_top_left(calc: BorderCalc):
+def test_calc_mask_top_left(calc: BlockCalc):
     x, y, w, h = calc.calc_mask(BlockType.TopLeft)
     assert w == 1928
     assert h == 1088
@@ -109,7 +109,7 @@ def test_calc_mask_top_left(calc: BorderCalc):
     assert y == 0
 
 
-def test_calc_mask_top_right(calc: BorderCalc):
+def test_calc_mask_top_right(calc: BlockCalc):
     x, y, w, h = calc.calc_mask(BlockType.TopRight)
     assert w == 1928
     assert h == 1088
@@ -117,7 +117,7 @@ def test_calc_mask_top_right(calc: BorderCalc):
     assert y == 0
 
 
-def test_calc_mask_bottom_left(calc: BorderCalc):
+def test_calc_mask_bottom_left(calc: BlockCalc):
     x, y, w, h = calc.calc_mask(BlockType.BottomLeft)
     assert w == 1928
     assert h == 1088
@@ -125,7 +125,7 @@ def test_calc_mask_bottom_left(calc: BorderCalc):
     assert y == 1072
 
 
-def test_calc_mask_bottom_right(calc: BorderCalc):
+def test_calc_mask_bottom_right(calc: BlockCalc):
     x, y, w, h = calc.calc_mask(BlockType.BottomRight)
     assert w == 1928
     assert h == 1088
@@ -133,7 +133,7 @@ def test_calc_mask_bottom_right(calc: BorderCalc):
     assert y == 1072
 
 
-def test_calc_spr_top_left(calc: BorderCalc):
+def test_calc_spr_top_left(calc: BlockCalc):
     x, y, w, h = calc.calc_spr(BlockType.TopLeft)
     assert w == 1920
     assert h == 1080
@@ -141,7 +141,7 @@ def test_calc_spr_top_left(calc: BorderCalc):
     assert y == 0
 
 
-def test_calc_spr_top_right(calc: BorderCalc):
+def test_calc_spr_top_right(calc: BlockCalc):
     x, y, w, h = calc.calc_spr(BlockType.TopRight)
     assert w == 1920
     assert h == 1080
@@ -149,7 +149,7 @@ def test_calc_spr_top_right(calc: BorderCalc):
     assert y == 0
 
 
-def test_calc_spr_bottom_left(calc: BorderCalc):
+def test_calc_spr_bottom_left(calc: BlockCalc):
     x, y, w, h = calc.calc_spr(BlockType.BottomLeft)
     assert w == 1920
     assert h == 1080
@@ -157,7 +157,7 @@ def test_calc_spr_bottom_left(calc: BorderCalc):
     assert y == 1080
 
 
-def test_calc_spr_bottom_right(calc: BorderCalc):
+def test_calc_spr_bottom_right(calc: BlockCalc):
     x, y, w, h = calc.calc_spr(BlockType.BottomRight)
     assert w == 1920
     assert h == 1080

@@ -10,7 +10,7 @@ from generator.plugins import (
     CROP_BLOCKS,
     MASK_BLOCKS,
     SPR_BLOCKS,
-    BorderCalc,
+    BlockCalc,
     PresetType,
 )
 from generator.preset import factory
@@ -96,24 +96,8 @@ class PipPreset:
         else:
             return f"{self.size:.0f}%"  # noqa
 
-    def padded_size(self):
-        return to_percent(
-            self.border + round((self.size / 100) * self.width), self.width
-        )
-
-    @property
-    def prefix(self):
-        return (100 - self.size) / 100
-
-    @property
-    def border(self):
-        if self.active_type == PresetType.MASK_SIMPLE:
-            return self.padding / 2
-        else:
-            return 0
-
     def calc_crop_preset(self):
-        calculator = BorderCalc(size=self.size)
+        calculator = BlockCalc(size=self.size)
         for corner in CROP_BLOCKS.keys():
             prefix = f"Pip_{corner.name}"
             template = Template(PRESETS[self.active_type])
@@ -127,7 +111,7 @@ class PipPreset:
             self.write_preset(f"{prefix}_{self.filename}", tpl)
 
     def calc_mask_preset(self):
-        calculator = BorderCalc(size=self.size)
+        calculator = BlockCalc(size=self.size)
         for corner in MASK_BLOCKS.keys():
             prefix = f"Pip_{corner.name}"
             template = Template(PRESETS[self.active_type])
@@ -141,7 +125,7 @@ class PipPreset:
             self.write_preset(f"{prefix}_{self.filename}", tpl)
 
     def calc_spr_preset(self):
-        calculator = BorderCalc(size=self.size)
+        calculator = BlockCalc(size=self.size)
         for corner in SPR_BLOCKS.keys():
             prefix = f"Pip_{corner.name}"
             template = Template(PRESETS[self.active_type])
