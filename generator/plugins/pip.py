@@ -6,7 +6,7 @@ import urllib
 from collections import namedtuple
 from dataclasses import dataclass
 from pathlib import Path
-from generator.plugins import MOD_CORNERS, BorderCalc, PresetType
+from generator.plugins import CROP_CORNERS, MASK_CORNERS, BorderCalc, PresetType
 from generator.preset import factory
 from generator.preset.utils import get_input_values, to_percent
 from generator.preset.types import InputValue
@@ -61,9 +61,9 @@ class PipPreset:
             case PresetType.CROP_RECTANGLE:
                 self.calc_crop_preset()
             case PresetType.SIZE_POSITION_ROTATE:
-                self.generate_preset()
+                self.calc_spr_preset()
             case PresetType.MASK_SIMPLE:
-                self.generate_preset()
+                self.calc_mask_preset()
 
     def inputs(self) -> list[InputValue]:
         if not self.values:
@@ -108,10 +108,24 @@ class PipPreset:
 
     def calc_crop_preset(self):
         calculator = BorderCalc(size=self.size)
-        for corner in MOD_CORNERS.keys():
+        for corner in CROP_CORNERS.keys():
             prefix = f"Pip_{corner.name}"
             template = Template(PRESETS[self.active_type])
-            x, y, w, h = calculator.calc_block(corner)
+            x, y, w, h = calculator.calc_crop(corner)
+            tpl = template.substitute(
+                x=to_percent(x, self.width),
+                y=to_percent(y, self.height),
+                height=to_percent(h, self.height),
+                width=to_percent(w, self.width),
+            )
+            self.write_preset(f"{prefix}_{self.filename}", tpl)
+
+    def calc_mask_preset(self):
+        calculator = BorderCalc(size=self.size)
+        for corner in MASK_CORNERS.keys():
+            prefix = f"Pip_{corner.name}"
+            template = Template(PRESETS[self.active_type])
+            x, y, w, h = calculator.calc_mask(corner)
             tpl = template.substitute(
                 x=to_percent(x, self.width),
                 y=to_percent(y, self.height),
@@ -183,7 +197,7 @@ class PipPreset:
         with open(path.resolve(), "w") as out_file:
             out_file.write(preset)
 
-    def generate_preset(self):
+    def calc_spr_preset(self):
         self.calc_top_left()
         self.calc_top_right()
         self.calc_bottom_left()

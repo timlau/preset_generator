@@ -27,11 +27,20 @@ class CornerType(IntEnum):
     BottomRight = 4
 
 
-MOD_CORNERS = {
+CROP_CORNERS = {
     CornerType.TopLeft: ModMatrix(dx=1, dy=1, dw=1.5, dh=1.5, xadj=0, yadj=0),
     CornerType.TopRight: ModMatrix(dx=0.5, dy=1, dw=1.5, dh=1.5, xadj=1, yadj=0),
     CornerType.BottomLeft: ModMatrix(dx=1, dy=0.5, dw=1.5, dh=2, xadj=0, yadj=1),
     CornerType.BottomRight: ModMatrix(dx=0.5, dy=0.5, dw=1.5, dh=2, xadj=1, yadj=1),
+}
+
+MASK_CORNERS = {
+    CornerType.TopLeft: ModMatrix(dx=0, dy=0, dw=-0.5, dh=-0.5, xadj=0, yadj=0),
+    CornerType.TopRight: ModMatrix(dx=-0.5, dy=0, dw=-0.5, dh=-0.5, xadj=1, yadj=0),
+    CornerType.BottomLeft: ModMatrix(dx=0, dy=-0.5, dw=-0.5, dh=-0.5, xadj=0, yadj=1),
+    CornerType.BottomRight: ModMatrix(
+        dx=-0.5, dy=-0.5, dw=-0.5, dh=-0.5, xadj=1, yadj=1
+    ),
 }
 
 
@@ -75,8 +84,12 @@ class BorderCalc:
         h = self.block_height - (self.border * mod.dh)
         return round(x), round(y), round(w), round(h)
 
-    def calc_block(self, corner: CornerType):
-        mod = MOD_CORNERS[corner]
+    def calc_crop(self, corner: CornerType):
+        mod = CROP_CORNERS[corner]
+        return self.block_size(mod)
+
+    def calc_mask(self, corner: CornerType):
+        mod = MASK_CORNERS[corner]
         return self.block_size(mod)
 
 
