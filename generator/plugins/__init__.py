@@ -113,11 +113,11 @@ class GridCalculator:
     padding: int = 32
 
     @cached_property
-    def grid_width(self):
+    def block_width(self):
         return round(self.width / self.columns)
 
     @cached_property
-    def grid_height(self):
+    def block_height(self):
         return round(self.height / self.rows)
 
     def calc_block(self, start_row, start_col, num_row, num_col, border: bool = True):
@@ -130,14 +130,14 @@ class GridCalculator:
             dt = 0
             # if no border we need to add extra to width & height
             extra = self.padding / 2
-        x = round(dt + (start_col * self.grid_width))
-        y = round(dt + (start_row * self.grid_height))
+        x = round(dt + (start_col * self.block_width))
+        y = round(dt + (start_row * self.block_height))
         if last_col == self.columns:
-            width = round(num_col * self.grid_width - (2 * dt)) + extra
+            width = round(num_col * self.block_width - (2 * dt)) + extra
         else:
-            width = round(num_col * self.grid_width - (dt)) + extra
+            width = round(num_col * self.block_width - (dt)) + extra
         if last_row == self.rows:
-            height = round(num_row * self.grid_height - (2 * dt)) + extra
+            height = round(num_row * self.block_height - (2 * dt)) + extra
         else:
-            height = round(num_row * self.grid_height - (dt)) + extra
+            height = round(num_row * self.block_height - (dt)) + extra
         return x, y, width, height
