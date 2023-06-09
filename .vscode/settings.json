@@ -8,6 +8,7 @@
     "python.analysis.diagnosticSeverityOverrides": {
         "reportUndefinedVariable": "none",
         "reportMissingModuleSource": "none",
+        "reportPrivateImportUsage": "none"
     },
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "file",
