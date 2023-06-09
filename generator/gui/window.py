@@ -1,12 +1,11 @@
 from pathlib import Path
 import platform
 
-from PyQt6.QtWidgets import (
-    QWidget,
-    QLabel,
-    QLineEdit,
-)
+from PyQt6.QtWidgets import QWidget, QLabel, QLineEdit, QVBoxLayout
 from PyQt6 import uic
+from PyQt6.QtMultimediaWidgets import QVideoWidget
+from PyQt6.QtMultimedia import QMediaPlayer
+from PyQt6.QtCore import QUrl
 
 from generator import DATA_DIR
 from generator.plugins import PRESET_NAMES
@@ -23,10 +22,27 @@ class MainWindow(QWidget):
         self.presets = None
         self.ui = None
         self.settings = None
+        self.setup_video()
 
     def setup(self, settings):
         self.settings = settings
         self.get_output_path()
+
+    def setup_video(self):
+        box = QVBoxLayout()
+        self.media_player = QMediaPlayer()
+
+        self.video_widget = QVideoWidget()
+        self.media_player.setVideoOutput(self.video_widget)
+        box.addWidget(self.video_widget)
+        self.preview.setLayout(box)
+
+    def play_video(self, preset: str):
+        video = DATA_DIR / Path(f"media/{preset}.webm")
+        print(video)
+        self.media_player.setSource(QUrl.fromLocalFile(video.as_posix()))
+        self.media_player.setPosition(0)
+        self.media_player.play()
 
     def add_presets(self, presets: list[PresetGenerator]):
         self.presets = presets
@@ -66,7 +82,9 @@ class MainWindow(QWidget):
     def on_preset_activated(self):
         index = self.cb_presets.currentIndex()
         print(f"New preset selected : {index}")
-        self.setup_parameters(self.presets[index])
+        preset = self.presets[index]
+        self.setup_parameters(preset)
+        self.play_video(preset.name.lower())
 
     def on_generate_clicked(self):
         index = self.cb_presets.currentIndex()

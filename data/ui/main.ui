@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>600</height>
+    <width>596</width>
+    <height>849</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -163,11 +163,21 @@ QLineInput {
        </layout>
       </item>
       <item>
+       <widget class="QWidget" name="preview" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>320</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QGroupBox" name="gb_parameters">
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>400</height>
+          <height>350</height>
          </size>
         </property>
         <property name="title">
