@@ -34,12 +34,24 @@ def get_output_path(setting_files: list[str]):
         for dst in setting_files
         if Path(dst).expanduser().exists()
     ]
-    paths = sorted(paths, key=lambda path: path.stat().st_mtime)
+    paths = sorted(paths, key=lambda path: path.stat().st_mtime, reverse=True)
+    appdata_dir = None
     if paths:
+        config_path: str = paths[0].as_posix()
+        print(f" --> config path: {config_path}")
         config = ConfigParser()
-        config.read(paths[0])
+        config.read(config_path)
         try:
-            return config["General"]["appdatadir"]
+            appdata_dir = Path(config["General"]["appdatadir"])
         except KeyError:
-            pass
-    return None
+            if "/.var/app/org.shotcut.Shotcut/" in config_path:
+                appdata_dir = Path(
+                    "~/.var/app/org.shotcut.Shotcut/data/Meltytech/Shotcut"
+                ).expanduser()
+            elif "/.config/" in config_path:
+                appdata_dir = Path("~/.local/share/Meltytech/Shotcut").expanduser()
+    if appdata_dir and appdata_dir.exists():
+        print(f" --> Shotcut app data dir: {appdata_dir}")
+        return appdata_dir.as_posix()
+    else:
+        return None
