@@ -91,7 +91,7 @@ class SlideInPreset:
 
     @property
     def filename(self):
-        return f"{self.fps}fps_{self.duration}s_{self.size:.0f}%"  # noqa
+        return f"{self.size:.0f}%_{self.fps}fps_{self.duration}s"  # noqa
 
     def calc_crop_preset(self):
         calculator = BlockCalc(size=self.size)
@@ -115,7 +115,7 @@ class SlideInPreset:
     def calc_crop_border_preset(self):
         calculator = BlockCalc(size=self.size)
         for corner in MASK_BLOCKS.keys():
-            prefix = f"SlideIn_{corner.name}"
+            prefix = f"SlideIn_{corner.name}_B"
             template = Template(PRESET_BORDER[self.active_type])
             x, y, w, h = calculator.calc_mask(corner)
             tpl = template.substitute(
