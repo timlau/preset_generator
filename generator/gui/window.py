@@ -19,8 +19,8 @@ class MainWindow(QWidget):
         super().__init__()
         ui_file = DATA_DIR / Path("ui/main.ui")
         uic.loadUi(ui_file, self)
-        self.presets = None
-        self.ui = None
+        self.presets: list[PresetGenerator] = None
+        self.ui: list = None
         self.settings = None
         self.setup_video()
 
