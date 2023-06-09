@@ -1,11 +1,12 @@
-from pathlib import Path
 import platform
+import os
 
+from pathlib import Path
 from PyQt6.QtWidgets import QWidget, QLabel, QLineEdit, QVBoxLayout
 from PyQt6 import uic
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtMultimedia import QMediaPlayer
-from PyQt6.QtCore import QUrl
+from PyQt6.QtCore import QUrl, pyqtSlot
 
 from generator import DATA_DIR
 from generator.plugins import PRESET_NAMES
@@ -33,6 +34,7 @@ class MainWindow(QWidget):
     def setup_video(self):
         box = QVBoxLayout()
         self.media_player = QMediaPlayer()
+        self.media_player.errorOccurred.connect(self.on_player_error)
         self.video_widget = QVideoWidget()
         self.media_player.setVideoOutput(self.video_widget)
         box.addWidget(self.video_widget)
@@ -53,15 +55,29 @@ class MainWindow(QWidget):
             self.cb_presets.addItem(preset.description)
         self.cb_presets.activated.connect(self.on_preset_activated)
         self.btn_generate.clicked.connect(self.on_generate_clicked)
+        self.le_output.textEdited.connect(self.on_output_edited)
         self.setup_parameters(self.presets[0])
 
     def get_output_path(self):
         print(f"platform: {platform.system()}")
-        if platform.system() == "Linux":
-            if path := get_output_path(self.settings.LIXUX_PATHS):
-                self.settings = self.settings._replace(output=path)
-                print(self.settings.output)
-        self.lbl_output.setText(self.settings.output)
+        match platform.system().lower():
+            case "linux":
+                if path := get_output_path(self.settings.LIXUX_PATHS):
+                    self.settings = self.settings._replace(output=path)
+            case "windows":
+                localappdata = os.getenv("LOCALAPPDATA")
+                path = Path(localappdata) / Path("Meltytech") / Path("Shotcut")
+                if path.exists():
+                    self.settings = self.settings._replace(output=str(path))
+            case "darwin":
+                path = Path(
+                    "~/Library/Application Support/Meltytech/Shotcut/"
+                ).expanduser()
+                if path.exists():
+                    self.settings = self.settings._replace(output=str(path))
+        print("Data directory: {self.settings.output}")
+
+        self.le_output.setText(self.settings.output)
 
     def clean_out_widgets(self, layout):
         for i in reversed(range(layout.count())):
@@ -83,6 +99,14 @@ class MainWindow(QWidget):
                 edit.setText(str(value.value))
             fbox.addRow(label, edit)
         self.play_video(preset.name.lower())
+
+    @pyqtSlot("QMediaPlayer::Error", str)
+    def on_player_error(self, error, error_string):
+        print(f"Video player error : {error_string}")
+
+    def on_output_edited(self, txt):
+        self.settings = self.settings._replace(output=txt)
+        print(self.settings.output)
 
     def on_preset_activated(self):
         index = self.cb_presets.currentIndex()

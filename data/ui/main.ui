@@ -216,20 +216,7 @@ QLineInput {
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLabel" name="lbl_output">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Sunken</enum>
-           </property>
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-          </widget>
+          <widget class="QLineEdit" name="le_output"/>
          </item>
         </layout>
        </widget>
