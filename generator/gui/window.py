@@ -22,7 +22,9 @@ class MainWindow(QWidget):
         self.presets: list[PresetGenerator] = None
         self.ui: list = None
         self.settings = None
-        self.setup_video()
+        self.media_player: QMediaPlayer = None
+        self.video_widget: QVideoWidget = None
+        self.setGeometry(0, 0, 600, 920)
 
     def setup(self, settings):
         self.settings = settings
@@ -31,7 +33,6 @@ class MainWindow(QWidget):
     def setup_video(self):
         box = QVBoxLayout()
         self.media_player = QMediaPlayer()
-
         self.video_widget = QVideoWidget()
         self.media_player.setVideoOutput(self.video_widget)
         box.addWidget(self.video_widget)
@@ -39,10 +40,12 @@ class MainWindow(QWidget):
 
     def play_video(self, preset: str):
         video = DATA_DIR / Path(f"media/{preset}.webm")
-        print(video)
-        self.media_player.setSource(QUrl.fromLocalFile(video.as_posix()))
-        self.media_player.setPosition(0)
-        self.media_player.play()
+        if video.exists():
+            if not self.media_player:
+                self.setup_video()
+            self.media_player.setSource(QUrl.fromLocalFile(video.as_posix()))
+            self.media_player.setPosition(0)
+            self.media_player.play()
 
     def add_presets(self, presets: list[PresetGenerator]):
         self.presets = presets
@@ -58,6 +61,7 @@ class MainWindow(QWidget):
             if path := get_output_path(self.settings.LIXUX_PATHS):
                 self.settings = self.settings._replace(output=path)
                 print(self.settings.output)
+        self.lbl_output.setText(self.settings.output)
 
     def clean_out_widgets(self, layout):
         for i in reversed(range(layout.count())):
@@ -78,13 +82,13 @@ class MainWindow(QWidget):
             if value.value:
                 edit.setText(str(value.value))
             fbox.addRow(label, edit)
+        self.play_video(preset.name.lower())
 
     def on_preset_activated(self):
         index = self.cb_presets.currentIndex()
         print(f"New preset selected : {index}")
         preset = self.presets[index]
         self.setup_parameters(preset)
-        self.play_video(preset.name.lower())
 
     def on_generate_clicked(self):
         index = self.cb_presets.currentIndex()
