@@ -30,7 +30,7 @@
   "settings": {
     "output": "./Shotcut",
     "LIXUX_PATHS": [
-      "~/.var/app/org.shotcut.Shotcut/config/Meltytech//Shotcut.conf",
+      "~/.var/app/org.shotcut.Shotcut/config/Meltytech/Shotcut.conf",
       "~/.config/Meltytech/Shotcut.conf"
     ]
   }
