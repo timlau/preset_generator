@@ -48,7 +48,7 @@ class SlideInPreset:
     padding: round
     values: list[InputValue] = None
     output: str = "./shotcut"
-    active_type: PresetType = PresetType.SIZE_POSITION_ROTATE
+    active_type: PresetType = PresetType.CROP_RECTANGLE
 
     def setup(self, settings: namedtuple) -> None:
         self.output = settings.output
