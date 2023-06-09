@@ -6,56 +6,65 @@ import urllib
 from collections import namedtuple
 from dataclasses import dataclass
 from pathlib import Path
-from generator.plugins import GridCalculator, PresetType
+from generator.plugins import (
+    CROP_BLOCKS,
+    MASK_BLOCKS,
+    BlockCalc,
+    PresetType,
+)
 from generator.preset import factory
 from generator.preset.utils import get_input_values, to_percent
 from generator.preset.types import InputValue
 
-PRESET = """---
+PRESET = {
+    PresetType.CROP_RECTANGLE: """---
 rect: 0=$x_start $y_start 0 0 1;$frame_in=$x_end $y_end $width $height 1;$frame_out=$x_end $y_end $width $height 1;$frame_end=$x_start $y_start 0 0 1
 radius: 0=0;$frame_in=0;$frame_out=0;$frame_end=0
 color: "#00000000"
 "shotcut:animIn": "00:00:01.000"
 "shotcut:animOut": "00:00:01.000"
 ..."""  # noqa
+}
 
-PRESET_BORDER = """---
+PRESET_BORDER = {
+    PresetType.CROP_RECTANGLE: """---
 rect: 0|=0 0 0 0 1;$frame_in|=$x_end $y_end $width $height 1;$frame_out|=0 0 0 0 1
 radius: 0
 color: "#00000000"
 "shotcut:animIn": "00:00:00.000"
 "shotcut:animOut": "00:00:00.000"
 ..."""
+}
 
 
 @dataclass
 class SlideInPreset:
     name: str
-    width: int
-    height: int
+    width: round
+    height: round
+    size: float
     fps: int
     duration: int
-    size: int
+    padding: round
     values: list[InputValue] = None
     output: str = "./shotcut"
-    grid_calc: GridCalculator = None
-    active_preset: PresetType = PresetType.CROP_RECTANGLE
+    active_type: PresetType = PresetType.SIZE_POSITION_ROTATE
 
     def setup(self, settings: namedtuple) -> None:
         self.output = settings.output
 
     def generate(self) -> None:
-        print(f"this is the {self.name} preset generator")
         values: namedtuple = get_input_values(self.values)
-        self.grid_calc = GridCalculator(rows=values.rows, columns=values.columns)
-        self.generate_preset()
+        self.size = values.size
+        self.fps = values.fps
+        self.duration = values.duration
+        self.calc_crop_preset()
+        self.calc_crop_border_preset()
 
     def inputs(self) -> list[InputValue]:
         if not self.values:
             self.values = [
-                InputValue("rows", "Rows", int, 3),
-                InputValue("columns", "Columns", int, 3),
-                InputValue("size", "Size", int, self.size),
+                InputValue("size", "Size(%)", float, self.size),
                 InputValue("duration", "Duration", int, self.duration),
                 InputValue("fps", "FPS", int, self.fps),
             ]
@@ -66,7 +75,7 @@ class SlideInPreset:
 
     @property
     def description(self) -> str:
-        return "Slide-In from corners"
+        return "Slide in from corners"
 
     @property
     def frame_end(self):
@@ -82,121 +91,57 @@ class SlideInPreset:
 
     @property
     def filename(self):
-        return f"{self.fps}fps_{self.duration}s_{self.size}x{self.size}"  # noqa
+        return f"{self.fps}fps_{self.duration}s_{self.size:.0f}%"  # noqa
 
-    def calc_top_left(self, border: bool = True):
-        x, y, w, h = self.grid_calc.calc_block(
-            0, 0, self.size, self.size, border=border
-        )
-        prefix = "SlideIn_TL"
-        if not border:
-            prefix += "_B"
-            template = Template(PRESET_BORDER)
-        else:
-            template = Template(PRESET)
-        tpl = template.substitute(
-            x_start=to_percent(x, self.width),
-            y_start=to_percent(y, self.height),
-            x_end=to_percent(x, self.width),
-            y_end=to_percent(y, self.height),
-            frame_in=self.frame_in,
-            frame_out=self.frame_out,
-            frame_end=self.frame_end,
-            height=to_percent(h, self.height),
-            width=to_percent(w, self.width),
-        )
-        self.write_preset(f"{prefix}_{self.filename}", tpl)
+    def calc_crop_preset(self):
+        calculator = BlockCalc(size=self.size)
+        for corner in CROP_BLOCKS.keys():
+            prefix = f"SlideIn_{corner.name}"
+            template = Template(PRESET[self.active_type])
+            x, y, w, h = calculator.calc_crop(corner)
+            tpl = template.substitute(
+                x_start=to_percent(x, self.width),
+                y_start=to_percent(y, self.height),
+                x_end=to_percent(x, self.width),
+                y_end=to_percent(y, self.height),
+                frame_in=self.frame_in,
+                frame_out=self.frame_out,
+                frame_end=self.frame_end,
+                height=to_percent(h, self.height),
+                width=to_percent(w, self.width),
+            )
+            self.write_preset(f"{prefix}_{self.filename}", tpl)
 
-    def calc_top_right(self, border: bool = True):
-        x, y, w, h = self.grid_calc.calc_block(
-            0, 1, self.size, self.size, border=border
-        )
-        prefix = "SlideIn_TR"
-        if not border:
-            prefix += "_B"
-            template = Template(PRESET_BORDER)
-        else:
-            template = Template(PRESET)
-        tpl = template.substitute(
-            x_start=to_percent(x + w, self.width),
-            y_start=to_percent(y, self.height),
-            x_end=to_percent(x, self.width),
-            y_end=to_percent(y, self.height),
-            frame_in=self.frame_in,
-            frame_out=self.frame_out,
-            frame_end=self.frame_end,
-            height=to_percent(h, self.height),
-            width=to_percent(w, self.width),
-        )
-        self.write_preset(f"{prefix}_{self.filename}", tpl)
-
-    def calc_bottom_left(self, border: bool = True):
-        x, y, w, h = self.grid_calc.calc_block(
-            1, 0, self.size, self.size, border=border
-        )
-        prefix = "SlideIn_BL"
-        if not border:
-            prefix += "_B"
-            template = Template(PRESET_BORDER)
-        else:
-            template = Template(PRESET)
-        tpl = template.substitute(
-            x_start=to_percent(x, self.width),
-            y_start=to_percent(y + h, self.height),
-            x_end=to_percent(x, self.width),
-            y_end=to_percent(y, self.height),
-            frame_in=self.frame_in,
-            frame_out=self.frame_out,
-            frame_end=self.frame_end,
-            height=to_percent(h, self.height),
-            width=to_percent(w, self.width),
-        )
-        self.write_preset(f"{prefix}_{self.filename}", tpl)
-
-    def calc_bottom_right(self, border: bool = True):
-        x, y, w, h = self.grid_calc.calc_block(
-            1, 1, self.size, self.size, border=border
-        )
-        prefix = "SlideIn_BR"
-        if not border:
-            prefix += "_B"
-            template = Template(PRESET_BORDER)
-        else:
-            template = Template(PRESET)
-        tpl = template.substitute(
-            x_start=to_percent(x + w, self.width),
-            y_start=to_percent(y + h, self.height),
-            x_end=to_percent(x, self.width),
-            y_end=to_percent(y, self.height),
-            frame_in=self.frame_in,
-            frame_out=self.frame_out,
-            frame_end=self.frame_end,
-            height=to_percent(h, self.height),
-            width=to_percent(w, self.width),
-        )
-        self.write_preset(f"{prefix}_{self.filename}", tpl)
+    def calc_crop_border_preset(self):
+        calculator = BlockCalc(size=self.size)
+        for corner in MASK_BLOCKS.keys():
+            prefix = f"SlideIn_{corner.name}"
+            template = Template(PRESET_BORDER[self.active_type])
+            x, y, w, h = calculator.calc_mask(corner)
+            tpl = template.substitute(
+                x_start=to_percent(x, self.width),
+                y_start=to_percent(y, self.height),
+                x_end=to_percent(x, self.width),
+                y_end=to_percent(y, self.height),
+                frame_in=self.frame_in,
+                frame_out=self.frame_out,
+                frame_end=self.frame_end,
+                height=to_percent(h, self.height),
+                width=to_percent(w, self.width),
+            )
+            self.write_preset(f"{prefix}_{self.filename}_Border", tpl)
 
     def write_preset(self, name: str, preset: str):
         qf_name = urllib.parse.quote_plus(name)
         directory = (
-            Path(self.output).expanduser() / Path("presets") / Path(self.active_preset)
+            Path(self.output).expanduser() / Path("presets") / Path(self.active_type)
         )
         if not directory.exists():
             directory.mkdir(parents=True, exist_ok=True)
         path = directory / Path(qf_name)
-        print(f"create preset {name} : {path.resolve().name}")
+        print(f"create preset {name} : {path.resolve().name} in {directory}")
         with open(path.resolve(), "w") as out_file:
             out_file.write(preset)
-
-    def generate_preset(self):
-        self.calc_top_left()
-        self.calc_top_left(border=False)
-        self.calc_top_right()
-        self.calc_top_right(border=False)
-        self.calc_bottom_left()
-        self.calc_bottom_left(border=False)
-        self.calc_bottom_right()
-        self.calc_bottom_right(border=False)
 
 
 def register() -> None:

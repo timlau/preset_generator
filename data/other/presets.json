@@ -16,7 +16,8 @@
       "height": 2150,
       "fps": 30,
       "duration": 5,
-      "size": 2
+      "size": 50,
+      "padding": 32
     },
     {
       "type": "pip",
