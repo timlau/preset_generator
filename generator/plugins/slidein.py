@@ -10,6 +10,7 @@ from generator.plugins import (
     CROP_BLOCKS,
     MASK_BLOCKS,
     BlockCalc,
+    BlockType,
     PresetType,
 )
 from generator.preset import factory
@@ -34,6 +35,15 @@ color: "#00000000"
 "shotcut:animIn": "00:00:00.000"
 "shotcut:animOut": "00:00:00.000"
 ..."""
+}
+
+StartMod = namedtuple("StartMod", ["dw", "dh"])
+
+START_POINTS = {
+    BlockType.TopLeft: StartMod(dw=0, dh=0),
+    BlockType.TopRight: StartMod(dw=1, dh=0),
+    BlockType.BottomLeft: StartMod(dw=0, dh=1),
+    BlockType.BottomRight: StartMod(dw=1, dh=1),
 }
 
 
@@ -99,9 +109,10 @@ class SlideInPreset:
             prefix = f"SlideIn_{corner.name}"
             template = Template(PRESET[self.active_type])
             x, y, w, h = calculator.calc_crop(corner)
+            mod = START_POINTS[corner]
             tpl = template.substitute(
-                x_start=to_percent(x, self.width),
-                y_start=to_percent(y, self.height),
+                x_start=to_percent(x + (mod.dw * self.height), self.width),
+                y_start=to_percent(y + (mod.dh * self.height), self.height),
                 x_end=to_percent(x, self.width),
                 y_end=to_percent(y, self.height),
                 frame_in=self.frame_in,
