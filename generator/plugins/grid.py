@@ -31,7 +31,6 @@ class GridPreset:
         self.output = settings.output
 
     def generate(self) -> None:
-        print(f"this is the {self.name} preset generator")
         values = get_dict_values(self.values)
         self.grid_calc = GridCalculator(**values)
         self.generate_preset()
@@ -72,12 +71,9 @@ class GridPreset:
         if not directory.exists():
             directory.mkdir(parents=True, exist_ok=True)
         path = directory / Path(qf_name)
-        if not path.exists() or self.overwrite:
-            print(f"create preset {name} : {path.resolve().name}")
-            with open(path.resolve(), "w") as out_file:
-                out_file.write(preset)
-        else:
-            print(f" --> {name} : {path.resolve().name} already exist")
+        print(f"create preset {name} : {path.resolve().name}")
+        with open(path.resolve(), "w") as out_file:
+            out_file.write(preset)
 
     def generate_preset(self):
         grid = self.grid_calc
