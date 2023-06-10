@@ -1,6 +1,6 @@
 import pytest
 
-from generator.plugins import GridCalculator
+from generator.calc import GridCalculator
 
 
 @pytest.fixture

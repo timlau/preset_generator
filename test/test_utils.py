@@ -1,5 +1,6 @@
 import pytest
 from generator.preset.types import InputValue
+
 from generator.preset.utils import (
     dict_to_namedtuple,
     to_percent,
@@ -9,7 +10,7 @@ from generator.preset.utils import (
 
 
 @pytest.fixture
-def values():
+def values() -> list[InputValue]:
     return [
         InputValue("size", "Size", float, 10.5),
         InputValue("x", "X", int, 10),

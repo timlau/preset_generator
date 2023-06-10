@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Protocol, Type
 
-from generator.plugins import PresetType
+from generator.calc import PresetType
 
 
 @dataclass

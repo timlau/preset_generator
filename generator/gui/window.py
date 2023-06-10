@@ -9,7 +9,7 @@ from PyQt6.QtMultimedia import QMediaPlayer
 from PyQt6.QtCore import QUrl, pyqtSlot
 
 from generator import DATA_DIR
-from generator.plugins import PRESET_NAMES
+from generator.calc import PRESET_NAMES
 from generator.preset import PresetGenerator
 from generator.preset.types import InputValue
 from generator.preset.utils import get_output_path

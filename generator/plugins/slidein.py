@@ -6,7 +6,7 @@ import urllib
 from collections import namedtuple
 from dataclasses import dataclass
 from pathlib import Path
-from generator.plugins import (
+from generator.calc import (
     CROP_BLOCKS,
     MASK_BLOCKS,
     BlockCalc,

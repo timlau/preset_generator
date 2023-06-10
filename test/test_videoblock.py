@@ -1,7 +1,6 @@
 import pytest
 
-from generator.calc import VideoBlock
-from generator.plugins import BlockType
+from generator.calc import VideoBlock, BlockType
 
 
 @pytest.fixture
@@ -90,3 +89,12 @@ def test_split(qhd):
     assert blocks[3].y == 1080
     assert blocks[3].width == 1920
     assert blocks[3].height == 1080
+
+
+def test_copy(qhd: VideoBlock):
+    new_block: VideoBlock = qhd.copy()
+    assert id(qhd) != id(new_block)
+    assert qhd.x == new_block.x
+    assert qhd.y == new_block.y
+    assert qhd.width == new_block.width
+    assert qhd.height == new_block.height

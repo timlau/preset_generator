@@ -1,5 +1,5 @@
 import pytest
-from generator.plugins import CROP_BLOCKS, BlockCalc, BlockType
+from generator.calc import CROP_BLOCKS, BlockCalc, BlockType
 
 
 @pytest.fixture

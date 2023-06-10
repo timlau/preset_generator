@@ -8,7 +8,7 @@ from string import Template
 from generator.preset import factory
 from generator.preset.utils import get_dict_values, to_percent
 from generator.preset.types import InputValue
-from generator.plugins import GridCalculator, PresetType
+from generator.calc import GridCalculator, PresetType
 
 PRESETS = {
     PresetType.CROP_RECTANGLE: """---
