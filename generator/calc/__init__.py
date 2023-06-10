@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Self
+from typing import Any, Generator, Self
 
 from generator.plugins import BlockType
 
@@ -11,7 +11,7 @@ class VideoBlock:
     width: int
     height: int
 
-    def split(self, rows: int, cols: int):
+    def split(self, rows: int, cols: int) -> Generator[Self, Any, None]:
         row_height = round(self.height / rows)
         col_width = round(self.width / cols)
         start_x = self.x
@@ -52,24 +52,28 @@ class VideoBlock:
                 self.x = frame.width - self.width
                 self.y = frame.height - self.height
 
-    def __iadd__(self, other: Self):
+    def __iadd__(self, other: Self) -> Self:
         self.x += other.x
         self.y += other.y
         self.width += other.width
         self.height += other.height
         return self
 
-    def __add__(self, other: Self):
+    def __add__(self, other: Self) -> Self:
         self += other
         return self
 
-    def __isub__(self, other: Self):
+    def __isub__(self, other: Self) -> Self:
         self.x -= other.x
         self.y -= other.y
         self.width -= other.width
         self.height -= other.height
         return self
 
-    def __sub__(self, other: Self):
+    def __sub__(self, other: Self) -> Self:
         self -= other
         return self
+
+
+def get_qhd_block() -> VideoBlock:
+    return VideoBlock(0, 0, 3840, 1920)
