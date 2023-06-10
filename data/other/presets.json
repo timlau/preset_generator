@@ -13,7 +13,7 @@
       "type": "slidein",
       "name": "SlideIn",
       "width": 3840,
-      "height": 2150,
+      "height": 2160,
       "fps": 30,
       "duration": 5,
       "size": 50,
@@ -23,7 +23,7 @@
       "type": "pip",
       "name": "Pip",
       "width": 3840,
-      "height": 2150,
+      "height": 2160,
       "size": 50,
       "padding": 32
     }
