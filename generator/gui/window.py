@@ -25,7 +25,8 @@ class MainWindow(QWidget):
         self.settings = None
         self.media_player: QMediaPlayer = None
         self.video_widget: QVideoWidget = None
-        self.setGeometry(0, 0, 600, 920)
+        self.setGeometry(0, 0, 600, 800)
+        self.set_message("Select generator, filter and press Generate")
 
     def setup(self, settings):
         self.settings = settings
@@ -100,6 +101,9 @@ class MainWindow(QWidget):
             fbox.addRow(label, edit)
         self.play_video(preset.name.lower())
 
+    def set_message(self, message: str):
+        self.lbl_message.setText(message)
+
     @pyqtSlot("QMediaPlayer::Error", str)
     def on_player_error(self, error, error_string):
         print(f"Video player error : {error_string}")
@@ -113,6 +117,7 @@ class MainWindow(QWidget):
         print(f"New preset selected : {index}")
         preset = self.presets[index]
         self.setup_parameters(preset)
+        self.set_message("")
 
     def on_generate_clicked(self):
         index = self.cb_presets.currentIndex()
@@ -126,3 +131,4 @@ class MainWindow(QWidget):
             text = self.ui[i].text()
             value.value_from_string(text)
         preset.generate()
+        self.set_message(f"{preset.description} presets was generated")
