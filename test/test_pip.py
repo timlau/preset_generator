@@ -1,21 +1,22 @@
 import pytest
+from pytest import MonkeyPatch
 from generator.calc import PresetType
 
 from generator.plugins.pip import PipPreset
 
 
 @pytest.fixture
-def pip():
+def pip() -> PipPreset:
     pip = PipPreset(name="pip", width=3840, height=2160, size=50.0, padding=32)
     inputs = pip.inputs()
     inputs[0].value = 50.0  # Size
     return pip
 
 
-def test_pip_crop(monkeypatch, pip: PipPreset):
+def test_pip_crop(monkeypatch: MonkeyPatch, pip: PipPreset) -> None:
     res = []
 
-    def write_preset(self, name: str, preset: str):
+    def write_preset(self, name: str, preset: str) -> None:
         res.append((name, preset))
 
     monkeypatch.setattr(PipPreset, "write_preset", write_preset)
